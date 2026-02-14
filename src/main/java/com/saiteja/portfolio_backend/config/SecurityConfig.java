@@ -54,7 +54,7 @@ public class SecurityConfig {
 
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                "https://portfolio-professional-sepia-rho.vercel.app"
+                "https://porthire.vercel.app"
         ));
 
         configuration.setAllowedMethods(List.of(
