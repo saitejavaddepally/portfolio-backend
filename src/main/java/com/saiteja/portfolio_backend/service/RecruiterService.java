@@ -27,7 +27,7 @@ public class RecruiterService {
                         .id(user.getId())
                         .email(user.getEmail())
                         .role(user.getRole())
-                        .userData(user)
+                        .userData(getProfessionalDetails(user.getId()))
                         .build())
                 .collect(Collectors.toList());
     }
