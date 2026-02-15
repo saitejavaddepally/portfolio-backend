@@ -10,4 +10,5 @@ public class UserSummaryResponse {
     private String id;
     private String email;
     private String role;
+    private Object userData;
 }
