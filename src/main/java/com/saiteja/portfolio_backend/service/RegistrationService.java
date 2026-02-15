@@ -1,5 +1,6 @@
 package com.saiteja.portfolio_backend.service;
 
+import com.saiteja.portfolio_backend.dto.RegisterRequest;
 import com.saiteja.portfolio_backend.exceptions.UserAlreadyExistsException;
 import com.saiteja.portfolio_backend.model.PendingRegistration;
 import com.saiteja.portfolio_backend.model.User;
@@ -24,9 +25,9 @@ public class RegistrationService {
     @Value("${spring.profiles.active:dev}")
     private String activeProfile;
 
-    public String initiateRegistration(String email, String role) {
+    public String initiateRegistration(RegisterRequest request, String role) {
 
-        if (userRepository.existsByEmail(email)) {
+        if (userRepository.existsByEmail(request.getEmail())) {
             throw new UserAlreadyExistsException(
                     "User already exists. Please login."
             );
@@ -34,11 +35,12 @@ public class RegistrationService {
 
         String otp = String.format("%06d", new Random().nextInt(999999));
 
-        pendingRepo.deleteByEmail(email);
+        pendingRepo.deleteByEmail(request.getEmail());
 
         PendingRegistration pending = PendingRegistration.builder()
-                .email(email)
+                .email(request.getEmail())
                 .role(role)
+                .passwordHash(passwordEncoder.encode(request.getPassword()))
                 .otpHash(passwordEncoder.encode(otp))
                 .expiryTime(new Date(System.currentTimeMillis() + 5 * 60 * 1000))
                 .build();
@@ -69,6 +71,7 @@ public class RegistrationService {
 
         User user = User.builder()
                 .email(pending.getEmail())
+                .password(pending.getPasswordHash())
                 .role(pending.getRole())
                 .build();
 

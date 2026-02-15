@@ -37,7 +37,7 @@ public class AuthService {
             );
         }
 
-        String otp = registrationService.initiateRegistration(request.getEmail(), String.valueOf(request.getRole()));
+        String otp = registrationService.initiateRegistration(request, String.valueOf(request.getRole()));
 
         try {
             if (!activeProfile.equals("dev")) {

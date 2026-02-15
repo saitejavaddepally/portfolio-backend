@@ -11,15 +11,11 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PendingRegistration {
-
     @Id
     private String id;
-
     private String email;
-
     private String role;
-
     private String otpHash;
-
+    private String passwordHash;
     private Date expiryTime;
 }
