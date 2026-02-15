@@ -7,6 +7,7 @@ import com.saiteja.portfolio_backend.exceptions.UserNotFoundException;
 import com.saiteja.portfolio_backend.model.User;
 import com.saiteja.portfolio_backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +18,13 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final RegistrationService registrationService;
+    private final EmailService emailService;
 
-    public AuthResponse register(RegisterRequest request) {
+    @Value("${spring.profiles.active:dev}")
+    private String activeProfile;
+
+    public OtpResponse register(RegisterRequest request) {
 
         if (request.getRole() != Role.PROFESSIONAL &&
                 request.getRole() != Role.RECRUITER) {
@@ -31,29 +37,24 @@ public class AuthService {
             );
         }
 
-        User user = User.builder()
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role(request.getRole().name())
+        String otp = registrationService.initiateRegistration(request.getEmail(), String.valueOf(request.getRole()));
+
+        try {
+            if (!activeProfile.equals("dev")) {
+                emailService.sendOtp(request.getEmail(), otp);
+            }
+        } catch (Exception e){
+            return OtpResponse.builder()
+                    .message("OTP_SENDING_FAILED")
+                    .error(e.getMessage())
+                    .build();
+        }
+
+        return  OtpResponse.builder()
+                .message("OTP_SENT_SUCCESSFULLY")
+                .error("")
                 .build();
 
-        userRepository.save(user);
-
-        String accessToken = jwtService.generateAccessToken(
-                user.getEmail(),
-                user.getRole()
-        );
-
-        String refreshToken = jwtService.generateRefreshToken(
-                user.getEmail()
-        );
-
-        return AuthResponse.builder()
-                .message("USER_REGISTRATION_SUCCESSFUL")
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .role(user.getRole())
-                .build();
     }
 
 

@@ -1,13 +1,15 @@
 package com.saiteja.portfolio_backend.controller;
 
-import com.saiteja.portfolio_backend.dto.AuthResponse;
-import com.saiteja.portfolio_backend.dto.LoginRequest;
-import com.saiteja.portfolio_backend.dto.RefreshTokenRequest;
-import com.saiteja.portfolio_backend.dto.RegisterRequest;
+import com.saiteja.portfolio_backend.dto.*;
+import com.saiteja.portfolio_backend.model.User;
 import com.saiteja.portfolio_backend.service.AuthService;
+import com.saiteja.portfolio_backend.service.EmailService;
+import com.saiteja.portfolio_backend.service.JwtService;
+import com.saiteja.portfolio_backend.service.RegistrationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequestMapping("/auth")
@@ -15,9 +17,12 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final RegistrationService registrationService;
+    private final JwtService jwtService;
+    private final EmailService emailService;
 
     @PostMapping("/register")
-    public AuthResponse register(@RequestBody RegisterRequest request) {
+    public OtpResponse register(@RequestBody RegisterRequest request) {
         return authService.register(request);
     }
 
@@ -31,6 +36,35 @@ public class AuthController {
             @RequestBody RefreshTokenRequest request) {
 
         return ResponseEntity.ok(authService.refreshToken(request));
+    }
+
+
+    @PostMapping("/register/verify-otp")
+    public ResponseEntity<AuthResponse> verifyRegistrationOtp(
+            @RequestBody OtpVerifyRequest request) {
+
+        User user = registrationService.completeRegistration(
+                request.getEmail(),
+                request.getOtp()
+        );
+
+        String accessToken = jwtService.generateAccessToken(
+                user.getEmail(),
+                user.getRole()
+        );
+
+        String refreshToken = jwtService.generateRefreshToken(
+                user.getEmail()
+        );
+
+        return ResponseEntity.ok(
+                AuthResponse.builder()
+                        .message("USER_REGISTRATION_SUCCESSFUL")
+                        .accessToken(accessToken)
+                        .refreshToken(refreshToken)
+                        .role(user.getRole())
+                        .build()
+        );
     }
 
 }
