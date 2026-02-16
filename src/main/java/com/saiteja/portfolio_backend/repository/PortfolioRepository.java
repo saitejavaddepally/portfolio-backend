@@ -3,6 +3,7 @@ package com.saiteja.portfolio_backend.repository;
 import com.saiteja.portfolio_backend.model.Portfolio;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface PortfolioRepository extends MongoRepository<Portfolio, String> {
@@ -14,4 +15,5 @@ public interface PortfolioRepository extends MongoRepository<Portfolio, String> 
     boolean existsByPublicSlug(String publicSlug);
 
 
+    List<Portfolio> findByUserEmailIn(List<String> emails);
 }

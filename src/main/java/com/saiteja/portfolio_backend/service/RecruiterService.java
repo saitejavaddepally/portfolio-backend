@@ -3,6 +3,7 @@ package com.saiteja.portfolio_backend.service;
 import com.saiteja.portfolio_backend.dto.UserDetailResponse;
 import com.saiteja.portfolio_backend.dto.UserSummaryResponse;
 import com.saiteja.portfolio_backend.exceptions.UserNotFoundException;
+import com.saiteja.portfolio_backend.model.Portfolio;
 import com.saiteja.portfolio_backend.model.User;
 import com.saiteja.portfolio_backend.repository.PortfolioRepository;
 import com.saiteja.portfolio_backend.repository.UserRepository;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,18 +21,39 @@ public class RecruiterService {
     private final UserRepository userRepository;
     private final PortfolioRepository portfolioRepository;
 
+
     public List<UserSummaryResponse> getAllProfessionals() {
 
-        return userRepository.findByRole("PROFESSIONAL")
-                .stream()
-                .map(user -> UserSummaryResponse.builder()
-                        .id(user.getId())
-                        .email(user.getEmail())
-                        .role(user.getRole())
-                        .userData(getProfessionalDetails(user.getId()))
-                        .build())
-                .collect(Collectors.toList());
+        List<User> professionals = userRepository.findByRole("PROFESSIONAL");
+
+        List<String> emails = professionals.stream()
+                .map(User::getEmail)
+                .toList();
+
+        List<Portfolio> portfolios = portfolioRepository.findByUserEmailIn(emails);
+
+        // Convert portfolio list to map for fast lookup
+        Map<String, Portfolio> portfolioMap = portfolios.stream()
+                .collect(Collectors.toMap(
+                        Portfolio::getUserEmail,
+                        p -> p
+                ));
+
+        return professionals.stream()
+                .map(user -> {
+
+                    Portfolio portfolio = portfolioMap.get(user.getEmail());
+
+                    return UserSummaryResponse.builder()
+                            .id(user.getId())
+                            .email(user.getEmail())
+                            .role(user.getRole())
+                            .userData(portfolio)
+                            .build();
+                })
+                .toList();
     }
+
 
     public UserDetailResponse getProfessionalDetails(String userId) {
 
