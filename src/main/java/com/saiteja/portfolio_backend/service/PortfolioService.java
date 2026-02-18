@@ -15,6 +15,8 @@ public class PortfolioService {
 
     private final PortfolioRepository portfolioRepository;
 
+    private final AISummaryService aiSummaryService;
+
     public Portfolio saveOrUpdatePortfolio(String email, Map<String, Object> data) {
 
         Portfolio portfolio = portfolioRepository.findByUserEmail(email)
@@ -27,6 +29,8 @@ public class PortfolioService {
 
         portfolio.setData(data);
         portfolio.setUpdatedAt(Instant.now());
+
+        aiSummaryService.generateAndSaveSummary(email,data);
 
         return portfolioRepository.save(portfolio);
     }
@@ -74,6 +78,5 @@ public class PortfolioService {
 
         return slug;
     }
-
 
 }
