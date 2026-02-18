@@ -48,13 +48,35 @@ public class AISummaryService {
                             
                             {
                               "professionalSummary": "",
+                              "yearsOfExperience": 0,
                               "coreSkills": [],
-                              "experienceHighlights": [],
-                              "projectHighlights": [],
-                              "educationSummary": "",
-                              "yearsOfExperience": 0
+=                              "workExperience": [
+                                {
+                                  "company": "",
+                                  "role": "",
+                                  "duration": "",
+                                  "keyResponsibilities": [],
+                                  "achievements": [],
+                                  "technologiesUsed": []
+                                }
+                              ],
+                                       
+                              "projects": [
+                                {
+                                  "name": "",
+                                  "description": "",
+                                  "technologiesUsed": [],
+                                  "impact": ""
+                                }
+                              ],
+                                       
+                              "education": {
+                                "institution": "",
+                                "degree": "",
+                                "fieldOfStudy": "",
+                                "highlights": ""
+                              }
                             }
-
                             Portfolio Data:
                             %s
                             """.formatted(portfolioJson);
