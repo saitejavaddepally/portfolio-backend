@@ -44,15 +44,22 @@ public class RecruiterService {
                     Portfolio portfolio = portfolioMap.get(user.getEmail());
 
                     List<String> skills = List.of();
+                    boolean isPublished = false;
+                    String publicSlug = null;
 
-                    if (portfolio != null &&
-                            portfolio.getData() != null &&
-                            portfolio.getData().get("skills") instanceof List<?>) {
+                    if (portfolio != null) {
 
-                        skills = ((List<?>) portfolio.getData().get("skills"))
-                                .stream()
-                                .map(Object::toString)
-                                .toList();
+                        isPublished = portfolio.isPublished();
+                        publicSlug = portfolio.getPublicSlug();
+
+                        if (portfolio.getData() != null &&
+                                portfolio.getData().get("skills") instanceof List<?>) {
+
+                            skills = ((List<?>) portfolio.getData().get("skills"))
+                                    .stream()
+                                    .map(Object::toString)
+                                    .toList();
+                        }
                     }
 
                     return UserSummaryResponse.builder()
@@ -60,6 +67,8 @@ public class RecruiterService {
                             .email(user.getEmail())
                             .role(user.getRole())
                             .skills(skills)
+                            .isPublished(isPublished)
+                            .publicSlug(publicSlug)
                             .build();
                 })
                 .toList();

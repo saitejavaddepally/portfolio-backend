@@ -11,8 +11,8 @@ public class UserSummaryResponse {
     private String id;
     private String email;
     private String role;
-
-    private List<String> skills; // lightweight
-
-    private Double matchScore; // nullable for now
+    private List<String> skills;
+    private Double matchScore;
+    private boolean isPublished;
+    private String publicSlug;
 }
