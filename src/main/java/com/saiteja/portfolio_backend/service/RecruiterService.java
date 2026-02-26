@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,7 +39,6 @@ public class RecruiterService {
                         u -> u
                 ));
 
-        // 4️⃣ Build response
         return portfolios.stream()
                 .map(portfolio -> {
 
@@ -72,14 +72,14 @@ public class RecruiterService {
                     }
 
                     return UserSummaryResponse.builder()
-                            .id(user.getId()) // ✅ USER ID (FIXED)
+                            .id(user.getId())
                             .email(user.getEmail())
                             .skills(skills)
                             .name(name)
                             .isPublished(true)
                             .build();
                 })
-                .filter(response -> response != null)
+                .filter(Objects::nonNull)
                 .toList();
     }
 
