@@ -1,5 +1,6 @@
 package com.saiteja.portfolio_backend.dto;
 
+import java.util.List;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,5 +11,8 @@ public class UserSummaryResponse {
     private String id;
     private String email;
     private String role;
-    private Object userData;
+
+    private List<String> skills; // lightweight
+
+    private Double matchScore; // nullable for now
 }

@@ -21,7 +21,6 @@ public class RecruiterService {
     private final UserRepository userRepository;
     private final PortfolioRepository portfolioRepository;
 
-
     public List<UserSummaryResponse> getAllProfessionals() {
 
         List<User> professionals = userRepository.findByRole("PROFESSIONAL");
@@ -30,9 +29,9 @@ public class RecruiterService {
                 .map(User::getEmail)
                 .toList();
 
-        List<Portfolio> portfolios = portfolioRepository.findByUserEmailIn(emails);
+        List<Portfolio> portfolios =
+                portfolioRepository.findSkillsByUserEmailIn(emails);
 
-        // Convert portfolio list to map for fast lookup
         Map<String, Portfolio> portfolioMap = portfolios.stream()
                 .collect(Collectors.toMap(
                         Portfolio::getUserEmail,
@@ -44,16 +43,27 @@ public class RecruiterService {
 
                     Portfolio portfolio = portfolioMap.get(user.getEmail());
 
+                    List<String> skills = List.of();
+
+                    if (portfolio != null &&
+                            portfolio.getData() != null &&
+                            portfolio.getData().get("skills") instanceof List<?>) {
+
+                        skills = ((List<?>) portfolio.getData().get("skills"))
+                                .stream()
+                                .map(Object::toString)
+                                .toList();
+                    }
+
                     return UserSummaryResponse.builder()
                             .id(user.getId())
                             .email(user.getEmail())
                             .role(user.getRole())
-                            .userData(portfolio)
+                            .skills(skills)
                             .build();
                 })
                 .toList();
     }
-
 
     public UserDetailResponse getProfessionalDetails(String userId) {
 
