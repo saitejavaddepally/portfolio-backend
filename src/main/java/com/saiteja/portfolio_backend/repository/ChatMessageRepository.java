@@ -12,7 +12,7 @@ public interface ChatMessageRepository extends MongoRepository<ChatMessage, Stri
             String candidateEmail
     );
 
-    List<ChatMessage> findTop10ByRecruiterEmailAndCandidateEmailOrderByCreatedAtDesc(
+    List<ChatMessage> findTop4ByRecruiterEmailAndCandidateEmailOrderByCreatedAtDesc(
             String recruiterEmail,
             String candidateEmail
     );
