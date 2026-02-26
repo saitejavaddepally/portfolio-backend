@@ -23,54 +23,63 @@ public class RecruiterService {
 
     public List<UserSummaryResponse> getAllProfessionals() {
 
-        List<User> professionals = userRepository.findByRole("PROFESSIONAL");
+        List<Portfolio> portfolios =
+                portfolioRepository.findPublishedPortfolios();
 
-        List<String> emails = professionals.stream()
-                .map(User::getEmail)
+        List<String> emails = portfolios.stream()
+                .map(Portfolio::getUserEmail)
                 .toList();
 
-        List<Portfolio> portfolios =
-                portfolioRepository.findPublishedSkillsByUserEmailIn(emails);
+        List<User> users = userRepository.findByEmailIn(emails);
 
-        Map<String, Portfolio> portfolioMap = portfolios.stream()
+        Map<String, User> userMap = users.stream()
                 .collect(Collectors.toMap(
-                        Portfolio::getUserEmail,
-                        p -> p
+                        User::getEmail,
+                        u -> u
                 ));
 
-        return professionals.stream()
-                .map(user -> {
+        // 4️⃣ Build response
+        return portfolios.stream()
+                .map(portfolio -> {
 
-                    Portfolio portfolio = portfolioMap.get(user.getEmail());
+                    User user = userMap.get(portfolio.getUserEmail());
+
+                    if (user == null) {
+                        return null; // should not happen ideally
+                    }
 
                     List<String> skills = List.of();
-                    boolean isPublished = false;
-                    String publicSlug = null;
+                    String name = null;
 
-                    if (portfolio != null) {
+                    Map<String, Object> data = portfolio.getData();
 
-                        isPublished = portfolio.isPublished();
-                        publicSlug = portfolio.getPublicSlug();
+                    if (data != null) {
 
-                        if (portfolio.getData() != null &&
-                                portfolio.getData().get("skills") instanceof List<?>) {
-
-                            skills = ((List<?>) portfolio.getData().get("skills"))
+                        if (data.get("skills") instanceof List<?>) {
+                            skills = ((List<?>) data.get("skills"))
                                     .stream()
                                     .map(Object::toString)
+                                    .filter(s -> !s.isBlank())
                                     .toList();
+                        }
+
+                        if (data.get("hero") instanceof Map<?, ?> heroMap) {
+                            Object nameObj = heroMap.get("name");
+                            if (nameObj != null) {
+                                name = nameObj.toString();
+                            }
                         }
                     }
 
                     return UserSummaryResponse.builder()
-                            .id(user.getId())
+                            .id(user.getId()) // ✅ USER ID (FIXED)
                             .email(user.getEmail())
-                            .role(user.getRole())
                             .skills(skills)
+                            .name(name)
                             .isPublished(true)
-                            .publicSlug(publicSlug)
                             .build();
                 })
+                .filter(response -> response != null)
                 .toList();
     }
 
@@ -79,11 +88,12 @@ public class RecruiterService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        if (!user.getRole().equals("PROFESSIONAL")) {
+        if (!"PROFESSIONAL".equals(user.getRole())) {
             throw new RuntimeException("Invalid user type");
         }
 
-        var portfolio = portfolioRepository.findByUserEmail(user.getEmail())
+        Portfolio portfolio = portfolioRepository
+                .findByUserEmail(user.getEmail())
                 .orElse(null);
 
         return UserDetailResponse.builder()

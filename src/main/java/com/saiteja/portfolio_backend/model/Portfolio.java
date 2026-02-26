@@ -16,15 +16,10 @@ public class Portfolio {
 
     @Id
     private String id;
-
     private String userEmail;
-
     private Map<String, Object> data;
-
     private boolean published;
-
     private String publicSlug;
-
     private Instant createdAt;
     private Instant updatedAt;
 }

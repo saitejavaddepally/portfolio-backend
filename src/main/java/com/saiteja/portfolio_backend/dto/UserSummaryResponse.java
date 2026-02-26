@@ -15,4 +15,5 @@ public class UserSummaryResponse {
     private Double matchScore;
     private boolean isPublished;
     private String publicSlug;
+    private String name;
 }

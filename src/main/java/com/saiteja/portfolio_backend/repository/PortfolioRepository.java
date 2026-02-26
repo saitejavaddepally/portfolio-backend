@@ -15,12 +15,16 @@ public interface PortfolioRepository extends MongoRepository<Portfolio, String> 
 
     boolean existsByPublicSlug(String publicSlug);
 
-
     List<Portfolio> findByUserEmailIn(List<String> emails);
 
     @Query(
-            value = "{ 'userEmail': { $in: ?0 }, 'isPublished': true }",
-            fields = "{ 'userEmail': 1, 'data.skills': 1, 'published': 1, 'publicSlug': 1 }"
+            value = "{ 'published': true }",
+            fields = "{ " +
+                    "'userEmail': 1, " +
+                    "'data.skills': 1, " +
+                    "'data.hero.name': 1, " +
+                    "'publicSlug': 1 " +
+                    "}"
     )
-    List<Portfolio> findPublishedSkillsByUserEmailIn(List<String> emails);
+    List<Portfolio> findPublishedPortfolios();
 }
