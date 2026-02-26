@@ -37,6 +37,7 @@ public class RecruiterChatService {
             String question
     ) {
 
+        // Save user message
         chatRepository.save(ChatMessage.builder()
                 .recruiterEmail(recruiterEmail)
                 .candidateEmail(candidateEmail)
@@ -45,7 +46,8 @@ public class RecruiterChatService {
                 .createdAt(Instant.now())
                 .build());
 
-        AISummary summary = aiSummaryRepository.findByUserEmail(candidateEmail)
+        AISummary summary = aiSummaryRepository
+                .findByUserEmail(candidateEmail)
                 .orElseThrow(() -> new RuntimeException("AI Summary not found"));
 
         String structuredJson;
@@ -71,7 +73,7 @@ public class RecruiterChatService {
         messages.add(new SystemMessage(getSystemPrompt(structuredJson)));
 
         for (ChatMessage m : lastMessages) {
-            if (m.getRole().equals("user")) {
+            if ("user".equals(m.getRole())) {
                 messages.add(new UserMessage(m.getContent()));
             } else {
                 messages.add(new AssistantMessage(m.getContent()));
@@ -85,11 +87,9 @@ public class RecruiterChatService {
         StringBuilder fullResponse = new StringBuilder();
 
         return chatModel.stream(prompt)
-                .map(chunk -> {
-                    String content = chunk.getResult().getOutput().getText();
-                    fullResponse.append(content);
-                    return content;
-                })
+                .map(chunk -> chunk.getResult().getOutput().getText())
+                .filter(text -> text != null && !text.isBlank())
+                .doOnNext(fullResponse::append)
                 .doOnComplete(() -> {
                     chatRepository.save(ChatMessage.builder()
                             .recruiterEmail(recruiterEmail)
