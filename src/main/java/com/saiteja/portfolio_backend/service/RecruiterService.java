@@ -30,7 +30,7 @@ public class RecruiterService {
                 .toList();
 
         List<Portfolio> portfolios =
-                portfolioRepository.findSkillsByUserEmailIn(emails);
+                portfolioRepository.findPublishedSkillsByUserEmailIn(emails);
 
         Map<String, Portfolio> portfolioMap = portfolios.stream()
                 .collect(Collectors.toMap(
@@ -67,7 +67,7 @@ public class RecruiterService {
                             .email(user.getEmail())
                             .role(user.getRole())
                             .skills(skills)
-                            .isPublished(isPublished)
+                            .isPublished(true)
                             .publicSlug(publicSlug)
                             .build();
                 })
