@@ -31,7 +31,7 @@ public class RecruiterSearchService {
         }
 
         Document vectorSearch = new Document("$vectorSearch",
-                new Document("index", "embedding_index")
+                new Document("index", "embedding")
                         .append("path", "embedding")
                         .append("queryVector", embeddingList)
                         .append("numCandidates", 100)
