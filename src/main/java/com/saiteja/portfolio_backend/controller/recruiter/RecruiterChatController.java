@@ -1,8 +1,8 @@
-package com.saiteja.portfolio_backend.controller;
+package com.saiteja.portfolio_backend.controller.recruiter;
 
 import com.saiteja.portfolio_backend.model.ChatMessage;
 import com.saiteja.portfolio_backend.repository.ChatMessageRepository;
-import com.saiteja.portfolio_backend.service.RecruiterChatService;
+import com.saiteja.portfolio_backend.service.recruiter.RecruiterChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;

@@ -1,11 +1,11 @@
-package com.saiteja.portfolio_backend.controller;
+package com.saiteja.portfolio_backend.controller.auth;
 
 import com.saiteja.portfolio_backend.dto.*;
 import com.saiteja.portfolio_backend.model.User;
-import com.saiteja.portfolio_backend.service.AuthService;
-import com.saiteja.portfolio_backend.service.EmailService;
-import com.saiteja.portfolio_backend.service.JwtService;
-import com.saiteja.portfolio_backend.service.RegistrationService;
+import com.saiteja.portfolio_backend.service.auth.AuthService;
+import com.saiteja.portfolio_backend.service.auth.EmailService;
+import com.saiteja.portfolio_backend.service.auth.JwtService;
+import com.saiteja.portfolio_backend.service.auth.RegistrationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

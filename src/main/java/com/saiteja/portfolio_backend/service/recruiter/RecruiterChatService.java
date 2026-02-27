@@ -1,6 +1,5 @@
-package com.saiteja.portfolio_backend.service;
+package com.saiteja.portfolio_backend.service.recruiter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.saiteja.portfolio_backend.model.AISummary;
 import com.saiteja.portfolio_backend.model.ChatMessage;

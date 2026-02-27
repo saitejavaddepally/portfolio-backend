@@ -1,8 +1,8 @@
-package com.saiteja.portfolio_backend.controller;
+package com.saiteja.portfolio_backend.controller.recruiter;
 
 import com.saiteja.portfolio_backend.dto.UserDetailResponse;
 import com.saiteja.portfolio_backend.dto.UserSummaryResponse;
-import com.saiteja.portfolio_backend.service.RecruiterService;
+import com.saiteja.portfolio_backend.service.recruiter.RecruiterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

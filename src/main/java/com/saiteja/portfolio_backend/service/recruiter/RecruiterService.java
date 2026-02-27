@@ -1,4 +1,4 @@
-package com.saiteja.portfolio_backend.service;
+package com.saiteja.portfolio_backend.service.recruiter;
 
 import com.saiteja.portfolio_backend.dto.UserDetailResponse;
 import com.saiteja.portfolio_backend.dto.UserSummaryResponse;

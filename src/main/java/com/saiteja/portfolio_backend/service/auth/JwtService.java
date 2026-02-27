@@ -1,4 +1,4 @@
-package com.saiteja.portfolio_backend.service;
+package com.saiteja.portfolio_backend.service.auth;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;

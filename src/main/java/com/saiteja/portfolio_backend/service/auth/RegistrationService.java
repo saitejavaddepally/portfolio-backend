@@ -1,4 +1,4 @@
-package com.saiteja.portfolio_backend.service;
+package com.saiteja.portfolio_backend.service.auth;
 
 import com.saiteja.portfolio_backend.dto.RegisterRequest;
 import com.saiteja.portfolio_backend.exceptions.UserAlreadyExistsException;

@@ -2,7 +2,7 @@ package com.saiteja.portfolio_backend.security;
 
 import com.saiteja.portfolio_backend.model.User;
 import com.saiteja.portfolio_backend.repository.UserRepository;
-import com.saiteja.portfolio_backend.service.JwtService;
+import com.saiteja.portfolio_backend.service.auth.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

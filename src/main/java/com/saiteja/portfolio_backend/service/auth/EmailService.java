@@ -1,4 +1,4 @@
-package com.saiteja.portfolio_backend.service;
+package com.saiteja.portfolio_backend.service.auth;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
