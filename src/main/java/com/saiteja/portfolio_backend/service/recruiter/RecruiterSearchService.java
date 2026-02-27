@@ -48,7 +48,7 @@ public class RecruiterSearchService {
         List<Document> pipeline = List.of(vectorSearch, project);
 
         return mongoTemplate
-                .getCollection("aiSummary")
+                .getCollection("ai_summaries")
                 .aggregate(pipeline)
                 .into(new ArrayList<>());
     }
