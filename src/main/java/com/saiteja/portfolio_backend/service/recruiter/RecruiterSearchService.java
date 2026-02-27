@@ -30,6 +30,8 @@ public class RecruiterSearchService {
             embeddingList.add((double) value);
         }
 
+        System.out.println("Embedding list size " + embeddingList.size());
+
         Document vectorSearch = new Document("$vectorSearch",
                 new Document("index", "vector_index")
                         .append("path", "embedding")
