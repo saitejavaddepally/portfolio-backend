@@ -1,0 +1,598 @@
+{
+  "info": {
+    "_postman_id": "portfolio-backend-collection",
+    "name": "Portfolio Backend API",
+    "description": "Complete API collection for Portfolio Backend service with JWT authentication",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "0"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register - Developer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"developer@example.com\",\n  \"password\": \"SecurePassword123!\",\n  \"role\": \"DEVELOPER\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Register a new developer account"
+          },
+          "response": []
+        },
+        {
+          "name": "Register - Recruiter",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"recruiter@example.com\",\n  \"password\": \"SecurePassword123!\",\n  \"role\": \"RECRUITER\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Register a new recruiter account"
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Registration OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"developer@example.com\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register/verify-otp",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "register",
+                "verify-otp"
+              ]
+            },
+            "description": "Verify OTP sent to email during registration"
+          },
+          "response": []
+        },
+        {
+          "name": "Login - Developer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var jsonData = pm.response.json();",
+                  "  pm.environment.set('access_token', jsonData.accessToken);",
+                  "  pm.environment.set('refresh_token', jsonData.refreshToken);",
+                  "  pm.environment.set('user_role', jsonData.role);",
+                  "  console.log('Developer tokens set successfully');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"developer@example.com\",\n  \"password\": \"SecurePassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Login as a developer. Returns access and refresh tokens which are automatically saved to environment variables."
+          },
+          "response": []
+        },
+        {
+          "name": "Login - Recruiter",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var jsonData = pm.response.json();",
+                  "  pm.environment.set('access_token', jsonData.accessToken);",
+                  "  pm.environment.set('refresh_token', jsonData.refreshToken);",
+                  "  pm.environment.set('user_role', jsonData.role);",
+                  "  console.log('Recruiter tokens set successfully');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"recruiter@example.com\",\n  \"password\": \"SecurePassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Login as a recruiter. Returns access and refresh tokens which are automatically saved to environment variables."
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var jsonData = pm.response.json();",
+                  "  pm.environment.set('access_token', jsonData.accessToken);",
+                  "  console.log('Access token refreshed successfully');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/refresh",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
+            },
+            "description": "Refresh expired access token using refresh token"
+          },
+          "response": []
+        }
+      ],
+      "description": "Authentication endpoints - Register, Login, OTP verification, and Token refresh"
+    },
+    {
+      "name": "Portfolio Management",
+      "item": [
+        {
+          "name": "Create/Update Portfolio",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"phone\": \"+1234567890\",\n  \"headline\": \"Senior Full-Stack Developer\",\n  \"about\": \"Passionate developer with 8 years of experience building scalable applications\",\n  \"experience\": [\n    {\n      \"title\": \"Senior Developer\",\n      \"company\": \"Tech Corp\",\n      \"duration\": \"2020 - Present\",\n      \"description\": \"Led development of microservices\"\n    }\n  ],\n  \"skills\": [\n    \"Java\",\n    \"Spring Boot\",\n    \"React\",\n    \"MongoDB\",\n    \"Docker\",\n    \"Kubernetes\"\n  ],\n  \"projects\": [\n    {\n      \"name\": \"E-Commerce Platform\",\n      \"description\": \"Built scalable e-commerce platform\",\n      \"link\": \"https://example.com\"\n    }\n  ],\n  \"education\": [\n    {\n      \"degree\": \"Bachelor of Technology\",\n      \"institution\": \"University Name\",\n      \"year\": \"2016\"\n    }\n  ],\n  \"socialLinks\": {\n    \"github\": \"https://github.com/username\",\n    \"linkedin\": \"https://linkedin.com/in/username\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/portfolio",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "portfolio"
+              ]
+            },
+            "description": "Create or update a portfolio. Requires JWT token in Authorization header."
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Portfolio",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/portfolio",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "portfolio"
+              ]
+            },
+            "description": "Get the authenticated user's portfolio"
+          },
+          "response": []
+        },
+        {
+          "name": "Publish Portfolio",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/portfolio/publish",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "portfolio",
+                "publish"
+              ]
+            },
+            "description": "Publish portfolio and get public slug URL"
+          },
+          "response": []
+        }
+      ],
+      "description": "Portfolio CRUD operations - Create, Read, Update, and Publish"
+    },
+    {
+      "name": "Public Portfolios",
+      "item": [
+        {
+          "name": "Get Public Portfolio by Slug",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/public/:slug",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "public",
+                ":slug"
+              ],
+              "variable": [
+                {
+                  "key": "slug",
+                  "value": "john-doe-portfolio",
+                  "description": "Portfolio public slug"
+                }
+              ]
+            },
+            "description": "Get any published portfolio by its public slug. No authentication required."
+          },
+          "response": []
+        }
+      ],
+      "description": "Public endpoints - View published portfolios without authentication"
+    },
+    {
+      "name": "Recruiter - Professionals",
+      "item": [
+        {
+          "name": "Get All Professionals",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/recruiter/professionals",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "recruiter",
+                "professionals"
+              ]
+            },
+            "description": "Get list of all professionals (developers). Requires RECRUITER role."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Professional Details by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/recruiter/professionals/:id",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "recruiter",
+                "professionals",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "developer_id_here",
+                  "description": "Developer/User ID"
+                }
+              ]
+            },
+            "description": "Get detailed information about a specific professional. Requires RECRUITER role."
+          },
+          "response": []
+        }
+      ],
+      "description": "Recruiter endpoints - Browse and view professional profiles"
+    },
+    {
+      "name": "Recruiter - Search",
+      "item": [
+        {
+          "name": "Search Candidates by Skills",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/recruiter/search?query=Java+Spring+Boot",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "recruiter",
+                "search"
+              ],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "Java+Spring+Boot",
+                  "description": "Search query for candidate skills"
+                }
+              ]
+            },
+            "description": "Search candidates using semantic similarity. Supports skill-based queries. Requires RECRUITER role."
+          },
+          "response": []
+        }
+      ],
+      "description": "Recruiter search endpoints - Find candidates using semantic search"
+    },
+    {
+      "name": "Recruiter - Chat & AI",
+      "item": [
+        {
+          "name": "Stream Recruiter Chat",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ai/stream?candidateEmail=developer@example.com&question=What+are+your+main+expertise+areas?",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ai",
+                "stream"
+              ],
+              "query": [
+                {
+                  "key": "candidateEmail",
+                  "value": "developer@example.com",
+                  "description": "Email of the candidate to ask about"
+                },
+                {
+                  "key": "question",
+                  "value": "What+are+your+main+expertise+areas?",
+                  "description": "Question about candidate"
+                }
+              ]
+            },
+            "description": "Stream AI responses about a candidate's portfolio. Supports SSE (Server-Sent Events). Requires RECRUITER role."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Chat History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/ai/history?recruiterEmail=recruiter@example.com&candidateEmail=developer@example.com",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ai",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "recruiterEmail",
+                  "value": "recruiter@example.com",
+                  "description": "Recruiter email"
+                },
+                {
+                  "key": "candidateEmail",
+                  "value": "developer@example.com",
+                  "description": "Candidate email"
+                }
+              ]
+            },
+            "description": "Get chat history between recruiter and candidate"
+          },
+          "response": []
+        }
+      ],
+      "description": "Recruiter chat endpoints - Ask AI questions about candidates"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// This script runs before each request",
+          "// It ensures the access token is available"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// This script runs after each request"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string",
+      "description": "Base URL of the API server"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string",
+      "description": "JWT Access Token - Set automatically after login"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "string",
+      "description": "JWT Refresh Token - Set automatically after login"
+    },
+    {
+      "key": "user_role",
+      "value": "",
+      "type": "string",
+      "description": "User role - DEVELOPER or RECRUITER"
+    }
+  ]
+}
+
