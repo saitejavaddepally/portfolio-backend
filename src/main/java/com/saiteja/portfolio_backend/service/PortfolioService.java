@@ -23,11 +23,11 @@ public class PortfolioService {
                 .orElse(
                         Portfolio.builder()
                                 .userEmail(email)
-                                .userId(userId)
                                 .createdAt(Instant.now())
                                 .build()
                 );
 
+        portfolio.setUserId(userId);
         portfolio.setData(data);
         portfolio.setUpdatedAt(Instant.now());
 
