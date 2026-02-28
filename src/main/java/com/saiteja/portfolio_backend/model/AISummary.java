@@ -18,6 +18,7 @@ public class AISummary {
     @Id
     private String id;
     private String userEmail;
+    private String userId;
     private String model;
     private Map<String, Object> structuredSummary;
     private String embeddingText;

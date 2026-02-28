@@ -31,7 +31,7 @@ public class PortfolioService {
         portfolio.setData(data);
         portfolio.setUpdatedAt(Instant.now());
 
-        aiSummaryService.generateAndSaveSummary(email,data);
+        aiSummaryService.generateAndSaveSummary(email,userId, data);
 
         return portfolioRepository.save(portfolio);
     }
