@@ -1,5 +1,6 @@
 package com.saiteja.portfolio_backend.security;
 
+import com.saiteja.portfolio_backend.dto.UserPrincipal;
 import com.saiteja.portfolio_backend.model.User;
 import com.saiteja.portfolio_backend.repository.UserRepository;
 import com.saiteja.portfolio_backend.service.auth.JwtService;
@@ -52,7 +53,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if (userOptional.isPresent()
                         && jwtService.isTokenValid(token, email)) {
 
-                    UsernamePasswordAuthenticationToken authToken = getUsernamePasswordAuthenticationToken(userOptional, email);
+                    UsernamePasswordAuthenticationToken authToken =
+                            getUsernamePasswordAuthenticationToken(userOptional.get());
 
                     authToken.setDetails(
                             new WebAuthenticationDetailsSource()
@@ -72,17 +74,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private static UsernamePasswordAuthenticationToken getUsernamePasswordAuthenticationToken(Optional<User> userOptional, String email) {
-        var user = userOptional.get();
+    private static UsernamePasswordAuthenticationToken getUsernamePasswordAuthenticationToken(User user) {
 
         var authorities = List.of(
                 new SimpleGrantedAuthority("ROLE_" + user.getRole())
         );
 
+        UserPrincipal principal = new UserPrincipal(
+                user.getId(),
+                user.getEmail(),
+                user.getRole()
+        );
+
         return new UsernamePasswordAuthenticationToken(
-                        email,
-                        null,
-                        authorities
-                );
+                principal,
+                null,
+                authorities
+        );
     }
 }

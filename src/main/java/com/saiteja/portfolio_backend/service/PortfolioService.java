@@ -17,12 +17,13 @@ public class PortfolioService {
 
     private final AISummaryService aiSummaryService;
 
-    public Portfolio saveOrUpdatePortfolio(String email, Map<String, Object> data) {
+    public Portfolio saveOrUpdatePortfolio(String email, String userId, Map<String, Object> data) {
 
         Portfolio portfolio = portfolioRepository.findByUserEmail(email)
                 .orElse(
                         Portfolio.builder()
                                 .userEmail(email)
+                                .userId(userId)
                                 .createdAt(Instant.now())
                                 .build()
                 );

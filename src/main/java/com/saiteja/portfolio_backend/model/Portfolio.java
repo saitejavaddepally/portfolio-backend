@@ -17,6 +17,7 @@ public class Portfolio {
     @Id
     private String id;
     private String userEmail;
+    private String userId;
     private Map<String, Object> data;
     private boolean published;
     private String publicSlug;
