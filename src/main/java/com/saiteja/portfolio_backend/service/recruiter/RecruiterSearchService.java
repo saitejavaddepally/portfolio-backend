@@ -42,6 +42,7 @@ public class RecruiterSearchService {
 
         Document project = new Document("$project",
                 new Document("userEmail", 1)
+                        .append("userId", 1)
                         .append("score", new Document("$meta", "vectorSearchScore"))
         );
 
