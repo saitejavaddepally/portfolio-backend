@@ -31,7 +31,7 @@ public class AISummaryService {
     private String modelName;
 
     @Async
-    public void generateAndSaveSummary(String userEmail,String userId, Map<String, Object> portfolioData) {
+    public void generateAndSaveSummary(String userEmail, String userId, Map<String, Object> portfolioData) {
 
         try {
 
@@ -100,12 +100,12 @@ public class AISummaryService {
                     .orElse(
                             AISummary.builder()
                                     .userEmail(userEmail)
-                                    .userId(userId)
                                     .model(modelName)
                                     .createdAt(Instant.now())
                                     .build()
                     );
 
+            summary.setUserId(userId);
             summary.setStructuredSummary(structuredJson);
             summary.setUpdatedAt(Instant.now());
             summary.setEmbeddingText(embeddingText);
