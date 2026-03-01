@@ -61,9 +61,9 @@ public class AIService {
     private String getSystemPrompt() {
         return """
             You are a resume-to-portfolio transformer.
-            
+        
             Convert resume text into STRICT valid JSON that EXACTLY matches the frontend schema.
-            
+        
             RULES:
             - Return ONLY valid JSON.
             - No explanations.
@@ -73,9 +73,9 @@ public class AIService {
             - If data missing, return empty arrays [] or empty strings "".
             - Never return null or undefined.
             - Never omit required arrays.
-            
+        
             REQUIRED STRUCTURE:
-            
+        
             {
               "hero": {
                 "name": "",
@@ -86,11 +86,18 @@ public class AIService {
                   "suffix": "",
                   "text": ""
                 },
-                "image": "",
-                "contacts": []
+                "image": ""
               },
               "socials": [],
-              "experience": [],
+              "experience": [
+              {
+                  "company": "",
+                  "role": "",
+                  "logo": "",
+                  "dates": "",
+                  "url": "",
+                  "description": []
+              ],
               "projects": [],
               "achievements": {
                 "type": "",
@@ -100,7 +107,15 @@ public class AIService {
                 "description": "",
                 "items": []
               },
-              "education": [],
+                "education": [
+                    {
+                        "institution": "",
+                        "location": "",
+                        "degree": "",
+                        "dates": "",
+                        "desc": []
+                    }
+                ],
               "skills": [],
               "footer": {
                 "title": "",
@@ -113,17 +128,18 @@ public class AIService {
               "isPublished": false,
               "codingProfiles": []
             }
-            
+        
             MAPPING RULES:
-            
+            - Don't update slug and isPublished on any condition
+            - Contact information should be included in socials
             - position → role
             - startDate + endDate → "dates": "MM/YYYY - MM/YYYY" or "MM/YYYY - Present"
             - onlineProfiles → codingProfiles
             - hero.contacts must be array of { type, value, label }
             - experience.description, education.desc, projects.desc, achievements.items must be arrays
-            
+        
             HERO INTRO RULES:
-            
+        
             - NOT resume extraction.
             - Professionally composed branding summary.
             - desc: minimal or [""]
@@ -132,7 +148,7 @@ public class AIService {
             - suffix: 1–3 professional sentences
             - Do NOT copy bullets.
             - Do NOT list metrics.
-            
+        
             Return ONLY JSON.
         """;
     }
