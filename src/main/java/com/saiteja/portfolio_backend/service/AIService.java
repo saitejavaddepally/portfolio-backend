@@ -90,13 +90,14 @@ public class AIService {
               },
               "socials": [],
               "experience": [
-              {
+                {
                   "company": "",
                   "role": "",
                   "logo": "",
                   "dates": "",
                   "url": "",
                   "description": []
+                }
               ],
               "projects": [],
               "achievements": {
@@ -108,13 +109,13 @@ public class AIService {
                 "items": []
               },
                 "education": [
-                    {
-                        "institution": "",
-                        "location": "",
-                        "degree": "",
-                        "dates": "",
-                        "desc": []
-                    }
+                {
+                    "institution": "",
+                    "location": "",
+                    "degree": "",
+                    "dates": "",
+                    "desc": []
+                }
                 ],
               "skills": [],
               "footer": {
