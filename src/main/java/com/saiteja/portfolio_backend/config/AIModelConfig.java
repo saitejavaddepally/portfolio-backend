@@ -32,7 +32,7 @@ public class AIModelConfig {
                 .openAiApi(openAiApi)
                 .defaultOptions(
                         OpenAiChatOptions.builder()
-                                .model("nvidia/nemotron-3-nano-30b-a3b:free")
+                                .model("nvidia/nemotron-nano-9b-v2:free")
                                 .temperature(0.2)
                                 .build()
                 )
