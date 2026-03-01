@@ -63,86 +63,69 @@ public class AIService {
         return """
         You are a professional resume-to-portfolio transformer.
 
-        Convert the resume text into STRICT valid JSON
+        Convert the resume into STRICT valid JSON
         matching EXACTLY the required UI schema.
 
-        ABSOLUTE RULES:
+        GLOBAL RULES:
         - Return ONLY valid JSON.
         - No explanations.
         - No markdown.
         - No backticks.
         - No comments.
-        - No trailing commas.
         - No hallucinated companies.
         - If data is missing, use empty arrays or empty strings.
-        - NEVER return paragraph descriptions.
-        - EVERY description field MUST be an array of bullet strings.
-        - Each bullet must be its own string element.
-        - Never combine multiple points into one string.
-        - Never return a single long paragraph.
+        - All description fields must be arrays.
 
-        REQUIRED OUTPUT STRUCTURE:
+        HERO SECTION RULES (CRITICAL):
 
-        {
-          "hero": {
-            "name": "",
-            "roles": [],
-            "intro": {
-              "desc": [],
-              "highlight": "",
-              "suffix": "",
-              "text": ""
-            },
-            "image": ""
-          },
-          "socials": [],
-          "experience": [],
-          "projects": [],
-          "achievements": {},
-          "education": [],
-          "skills": [],
-          "footer": {
-            "title": "",
-            "subtitle": "",
-            "email": "",
-            "socials": []
-          },
-          "activeTemplate": "medium",
-          "slug": "",
-          "isPublished": false,
-          "codingProfiles": []
-        }
+        The hero section is NOT raw resume extraction.
+        It must be professionally composed and branding-focused.
 
-        BULLET ENFORCEMENT (CRITICAL):
-
-        - hero.intro.desc → MUST be an array of short bullet points.
-        - experience[].description → MUST be an array of bullet points.
-        - projects[].desc → MUST be an array of bullet points.
-        - education[].desc → MUST be an array of bullet points.
-        - achievements.items → MUST be an array of bullet points.
-
-        - Every responsibility must be a separate string.
-        - Preserve metrics like percentages, TPS, time reductions.
-        - Keep technical terms intact.
-        - Do NOT compress bullets.
-        - Do NOT merge bullets.
-
-        EXPERIENCE FORMAT EXAMPLE:
+        hero.intro must follow this style:
 
         {
-          "company": "DBS Bank",
-          "role": "Full Stack Developer",
-          "logo": "https://www.google.com/s2/favicons?domain=dbs.com&sz=128",
-          "dates": "07/2022 - Present",
-          "url": "https://www.dbs.com/",
-          "description": [
-            "Designed secure Consent Management System enabling partner banks to access account details.",
-            "Integrated Spring AOP for fine-grained data authorization.",
-            "Automated Apache upgrade reducing effort from 5 hours to 30 minutes."
-          ]
+          "desc": [""],     // Keep minimal. Can contain one short sentence or be empty.
+          "highlight": "",  // Main tech stack or strongest skill keyword (e.g., "Java & Spring Boot")
+          "text": "",       // Short prefix phrase like: "I build scalable systems with"
+          "suffix": ""      // 1–3 line professional branding summary written naturally
         }
 
-        FINAL INSTRUCTION:
+        INSTRUCTIONS FOR HERO GENERATION:
+
+        - Do NOT copy resume bullet points.
+        - Do NOT list achievements here.
+        - This is a professional branding summary.
+        - Keep it clean and impactful.
+        - highlight → strongest technology stack.
+        - text → short starting phrase.
+        - suffix → professional 2–3 line identity statement.
+        - Avoid generic phrases like "hardworking individual".
+        - Make it sound modern and confident.
+
+        Example Style:
+
+        "intro": {
+            "desc": [""],
+            "highlight": "Java, Spring Boot & Distributed Systems",
+            "text": "I build scalable enterprise systems with",
+            "suffix": "a strong focus on security, performance, and automation. I enjoy solving complex backend challenges and transforming business problems into reliable technical solutions."
+        }
+
+        EXPERIENCE RULES:
+        - experience must be array.
+        - description must be array of bullet points.
+        - Preserve metrics like %, TPS, reductions.
+
+        SKILLS:
+        - Only technical skills.
+        - No soft skills.
+
+        EDUCATION:
+        - Convert properly.
+
+        SLUG:
+        - Lowercase full name with hyphens.
+
         Return ONLY valid JSON.
         """;
     }
