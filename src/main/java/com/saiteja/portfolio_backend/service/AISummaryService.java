@@ -6,6 +6,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.saiteja.portfolio_backend.model.AISummary;
 import com.saiteja.portfolio_backend.repository.AISummaryRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.embedding.EmbeddingResponse;
@@ -22,6 +24,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AISummaryService {
 
+    private static final Logger logger = LoggerFactory.getLogger(AISummaryService.class);
+
     private final ChatModel chatModel;
     private final EmbeddingModel embeddingModel;
     private final AISummaryRepository aiSummaryRepository;
@@ -33,9 +37,14 @@ public class AISummaryService {
     @Async
     public void generateAndSaveSummary(String userEmail, String userId, Map<String, Object> portfolioData) {
 
+        long startTime = System.currentTimeMillis();
+        logger.info("AI Summary generation started for email: {} - userId: {}", userEmail, userId);
+
         try {
 
+            logger.debug("Serializing portfolio data for email: {}", userEmail);
             String portfolioJson = objectMapper.writeValueAsString(portfolioData);
+            logger.trace("Portfolio JSON: {}", portfolioJson);
 
             String systemPrompt = """
                                 You are an AI that generates structured professional summaries.
@@ -86,14 +95,26 @@ public class AISummaryService {
                             %s
                             """.formatted(portfolioJson);
 
-            String aiResponse = chatModel.call(systemPrompt + "\n" + userPrompt);
+            logger.debug("Calling ChatModel for AI summary generation (model: {}) for email: {}",
+                modelName, userEmail);
 
+            String aiResponse = chatModel.call(systemPrompt + "\n" + userPrompt);
+            logger.trace("AI Response received for email: {}", userEmail);
+
+            logger.debug("Parsing AI response JSON for email: {}", userEmail);
             Map<String, Object> structuredJson =
                     objectMapper.readValue(aiResponse, new TypeReference<Map<String, Object>>() {});
 
-            String embeddingText = buildEmbeddingText(structuredJson);
+            logger.trace("Structured JSON parsed successfully for email: {}", userEmail);
 
+            String embeddingText = buildEmbeddingText(structuredJson);
+            logger.debug("Embedding text built (length: {}) for email: {}",
+                embeddingText.length(), userEmail);
+
+            logger.debug("Generating embedding vector for email: {}", userEmail);
             List<Double> embedding = generateEmbedding(embeddingText);
+            logger.debug("Embedding generated successfully (dimensions: {}) for email: {}",
+                embedding.size(), userEmail);
 
             AISummary summary = aiSummaryRepository
                     .findByUserEmail(userEmail)
@@ -113,15 +134,22 @@ public class AISummaryService {
 
             aiSummaryRepository.save(summary);
 
-            System.out.println("Ai Summary successfully stored " + summary);
+            long duration = System.currentTimeMillis() - startTime;
+            logger.info("AI Summary successfully generated and saved for email: {} - Duration: {}ms",
+                userEmail, duration);
 
         } catch (Exception e) {
+            long duration = System.currentTimeMillis() - startTime;
+            logger.error("Failed to generate AI summary for email: {} - Duration: {}ms - Error: {}",
+                userEmail, duration, e.getMessage(), e);
             throw new RuntimeException("Failed to generate AI summary", e);
         }
     }
 
 
     private String buildEmbeddingText(Map<String, Object> summary) {
+
+        logger.debug("Building embedding text from AI summary");
 
         StringBuilder sb = new StringBuilder();
 
@@ -144,10 +172,13 @@ public class AISummaryService {
             sb.append("\n\n");
         }
 
+        logger.trace("Embedding text built with length: {}", sb.length());
         return sb.toString();
     }
 
     private List<Double> generateEmbedding(String text) {
+
+        logger.debug("Generating embedding for text (length: {})", text.length());
 
         EmbeddingResponse response =
                 embeddingModel.embedForResponse(List.of(text));
@@ -158,6 +189,7 @@ public class AISummaryService {
             embeddings.add((double) embedding);
         }
 
+        logger.debug("Embedding generation completed - Dimensions: {}", embeddings.size());
         return embeddings;
     }
 }

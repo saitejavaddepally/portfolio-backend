@@ -6,6 +6,8 @@ import com.saiteja.portfolio_backend.model.ChatMessage;
 import com.saiteja.portfolio_backend.repository.AISummaryRepository;
 import com.saiteja.portfolio_backend.repository.ChatMessageRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
@@ -24,6 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RecruiterChatService {
 
+    private static final Logger logger = LoggerFactory.getLogger(RecruiterChatService.class);
 
     private final ChatMessageRepository chatRepository;
     private final AISummaryRepository aiSummaryRepository;
@@ -36,6 +39,10 @@ public class RecruiterChatService {
             String question
     ) {
 
+        long startTime = System.currentTimeMillis();
+        logger.info("Chat stream started - Recruiter: {} - Candidate: {} - Question: {}",
+            recruiterEmail, candidateEmail, question);
+
         // Save user message
         chatRepository.save(ChatMessage.builder()
                 .recruiterEmail(recruiterEmail)
@@ -45,15 +52,25 @@ public class RecruiterChatService {
                 .createdAt(Instant.now())
                 .build());
 
+        logger.debug("User message saved for recruiter-candidate chat");
+
         AISummary summary = aiSummaryRepository
                 .findByUserEmail(candidateEmail)
-                .orElseThrow(() -> new RuntimeException("AI Summary not found"));
+                .orElseThrow(() -> {
+                    logger.error("AI Summary not found for candidate: {}", candidateEmail);
+                    return new RuntimeException("AI Summary not found");
+                });
+
+        logger.debug("AI summary retrieved for candidate: {}", candidateEmail);
 
         String structuredJson;
         try {
             structuredJson = objectMapper
                     .writeValueAsString(summary.getStructuredSummary());
+            logger.trace("Summary JSON serialized successfully");
         } catch (Exception e) {
+            logger.error("Failed to serialize summary for candidate: {} - Error: {}",
+                candidateEmail, e.getMessage(), e);
             throw new RuntimeException("Failed to serialize summary");
         }
 
@@ -63,6 +80,8 @@ public class RecruiterChatService {
                                 recruiterEmail,
                                 candidateEmail
                         );
+
+        logger.debug("Retrieved {} previous messages for recruiter-candidate chat", lastMessages.size());
 
         Collections.reverse(lastMessages);
 
@@ -81,6 +100,8 @@ public class RecruiterChatService {
 
         messages.add(new UserMessage(question));
 
+        logger.debug("Chat message prompt built with {} messages", messages.size());
+
         Prompt prompt = new Prompt(messages);
 
         StringBuilder fullResponse = new StringBuilder();
@@ -97,6 +118,15 @@ public class RecruiterChatService {
                             .content(fullResponse.toString())
                             .createdAt(Instant.now())
                             .build());
+
+                    long duration = System.currentTimeMillis() - startTime;
+                    logger.info("Chat stream completed - Recruiter: {} - Candidate: {} - Response length: {} - Duration: {}ms",
+                        recruiterEmail, candidateEmail, fullResponse.length(), duration);
+                })
+                .doOnError(error -> {
+                    long duration = System.currentTimeMillis() - startTime;
+                    logger.error("Chat stream error - Recruiter: {} - Candidate: {} - Error: {} - Duration: {}ms",
+                        recruiterEmail, candidateEmail, error.getMessage(), duration, error);
                 });
     }
 

@@ -2,6 +2,8 @@ package com.saiteja.portfolio_backend.service.recruiter;
 
 import lombok.RequiredArgsConstructor;
 import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.embedding.EmbeddingResponse;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -14,11 +16,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RecruiterSearchService {
 
+    private static final Logger logger = LoggerFactory.getLogger(RecruiterSearchService.class);
+
     private final EmbeddingModel embeddingModel;
     private final MongoTemplate mongoTemplate;
 
     public List<Document> searchCandidates(String query) {
 
+        long startTime = System.currentTimeMillis();
+        logger.info("Candidate search initiated - Query: {}", query);
+
+        logger.debug("Generating embedding for search query");
         EmbeddingResponse response =
                 embeddingModel.embedForResponse(List.of(query));
 
@@ -30,7 +38,7 @@ public class RecruiterSearchService {
             embeddingList.add((double) value);
         }
 
-        System.out.println("Embedding list --> " + embeddingList);
+        logger.debug("Search embedding generated - Dimensions: {}", embeddingList.size());
 
         Document vectorSearch = new Document("$vectorSearch",
                 new Document("index", "vector_index")
@@ -48,9 +56,16 @@ public class RecruiterSearchService {
 
         List<Document> pipeline = List.of(vectorSearch, project);
 
-        return mongoTemplate
+        logger.debug("Executing MongoDB vector search pipeline");
+        List<Document> results = mongoTemplate
                 .getCollection("ai_summaries")
                 .aggregate(pipeline)
                 .into(new ArrayList<>());
+
+        long duration = System.currentTimeMillis() - startTime;
+        logger.info("Candidate search completed - Query: {} - Results: {} - Duration: {}ms",
+            query, results.size(), duration);
+
+        return results;
     }
 }

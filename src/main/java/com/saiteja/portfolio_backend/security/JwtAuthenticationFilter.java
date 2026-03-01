@@ -9,6 +9,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,6 +26,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+
     private final JwtService jwtService;
     private final UserRepository userRepository;
 
@@ -33,9 +37,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
+        String requestPath = request.getRequestURI();
+        logger.debug("Processing request: {} - Method: {}", requestPath, request.getMethod());
+
         final String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            logger.debug("No valid Authorization header found for request: {}", requestPath);
             filterChain.doFilter(request, response);
             return;
         }
@@ -44,31 +52,45 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             final String email = jwtService.extractEmail(token);
+            logger.debug("Extracted email from token: {} - Request: {}", email, requestPath);
 
             if (email != null &&
                     SecurityContextHolder.getContext().getAuthentication() == null) {
 
                 var userOptional = userRepository.findByEmail(email);
 
-                if (userOptional.isPresent()
-                        && jwtService.isTokenValid(token, email)) {
+                if (userOptional.isPresent()) {
+                    if (jwtService.isTokenValid(token, email)) {
+                        logger.debug("JWT token validation successful for email: {} - Request: {}",
+                            email, requestPath);
 
-                    UsernamePasswordAuthenticationToken authToken =
-                            getUsernamePasswordAuthenticationToken(userOptional.get());
+                        UsernamePasswordAuthenticationToken authToken =
+                                getUsernamePasswordAuthenticationToken(userOptional.get());
 
-                    authToken.setDetails(
-                            new WebAuthenticationDetailsSource()
-                                    .buildDetails(request)
-                    );
+                        authToken.setDetails(
+                                new WebAuthenticationDetailsSource()
+                                        .buildDetails(request)
+                        );
 
-                    SecurityContextHolder.getContext()
-                            .setAuthentication(authToken);
+                        SecurityContextHolder.getContext()
+                                .setAuthentication(authToken);
+
+                        logger.info("User authenticated successfully - Email: {} - Request: {} - Role: {}",
+                            email, requestPath, userOptional.get().getRole());
+                    } else {
+                        logger.warn("JWT token validation failed for email: {} - Request: {}",
+                            email, requestPath);
+                    }
+                } else {
+                    logger.warn("User not found for email: {} - Token extraction failed - Request: {}",
+                        email, requestPath);
                 }
             }
 
         } catch (Exception e) {
-            System.out.println("Token Expired");
-            e.getStackTrace();
+            logger.error("Exception occurred during JWT authentication for request: {} - Error: {}",
+                requestPath, e.getMessage());
+            logger.trace("Full stack trace:", e);
         }
 
         filterChain.doFilter(request, response);
