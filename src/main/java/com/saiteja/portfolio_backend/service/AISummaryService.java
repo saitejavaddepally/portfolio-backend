@@ -26,7 +26,7 @@ public class AISummaryService {
 
     private static final Logger logger = LoggerFactory.getLogger(AISummaryService.class);
 
-    private final ChatModel chatModel;
+    private final ChatModel recruiterChatModel;
     private final EmbeddingModel embeddingModel;
     private final AISummaryRepository aiSummaryRepository;
     private final ObjectMapper objectMapper;
@@ -98,7 +98,7 @@ public class AISummaryService {
             logger.debug("Calling ChatModel for AI summary generation (model: {}) for email: {}",
                 modelName, userEmail);
 
-            String aiResponse = chatModel.call(systemPrompt + "\n" + userPrompt);
+            String aiResponse = recruiterChatModel.call(systemPrompt + "\n" + userPrompt);
             logger.trace("AI Response received for email: {}", userEmail);
 
             logger.debug("Parsing AI response JSON for email: {}", userEmail);
