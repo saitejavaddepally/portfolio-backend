@@ -30,7 +30,7 @@ public class RecruiterChatService {
 
     private final ChatMessageRepository chatRepository;
     private final AISummaryRepository aiSummaryRepository;
-    private final ChatModel chatModel;
+    private final ChatModel resumeChatModel;
     private final ObjectMapper objectMapper;
 
     public Flux<String> streamRecruiterAnswer(
@@ -106,7 +106,7 @@ public class RecruiterChatService {
 
         StringBuilder fullResponse = new StringBuilder();
 
-        return chatModel.stream(prompt)
+        return resumeChatModel.stream(prompt)
                 .map(chunk -> chunk.getResult().getOutput().getText())
                 .filter(text -> text != null && !text.isBlank())
                 .doOnNext(fullResponse::append)

@@ -19,7 +19,7 @@ public class AIService {
 
     private static final Logger logger = LoggerFactory.getLogger(AIService.class);
 
-    private final ChatModel chatModel;
+    private final ChatModel recruiterChatModel;
     private final ObjectMapper objectMapper;
 
     public Map<String, Object> parseResume(String resumeText) {
@@ -34,7 +34,7 @@ public class AIService {
                     new UserMessage(resumeText)
             ));
 
-            String response = chatModel.call(prompt)
+            String response = recruiterChatModel.call(prompt)
                     .getResult()
                     .getOutput()
                     .getText();
