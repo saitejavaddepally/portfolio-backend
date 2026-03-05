@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Property defaults -->
+    <property name="LOG_FILE" value="logs/application.log"/>
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
+
+    <!-- CONSOLE APPENDER - Critical for Render to capture logs -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <!-- Ensure logs are flushed immediately for Render -->
+        <immediateFlush>true</immediateFlush>
+    </appender>
+
+    <!-- FILE APPENDER - Optional for local file storage -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}</file>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/application-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>7</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!-- ASYNC APPENDER for Console - Better performance -->
+    <appender name="ASYNC_CONSOLE" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>512</queueSize>
+        <discardingThreshold>0</discardingThreshold>
+        <includeCallerData>false</includeCallerData>
+        <appender-ref ref="CONSOLE"/>
+    </appender>
+
+    <!-- LOGGER CONFIGURATIONS -->
+    <logger name="com.saiteja.portfolio_backend" level="DEBUG"/>
+    <logger name="com.saiteja.portfolio_backend.service" level="DEBUG"/>
+    <logger name="com.saiteja.portfolio_backend.controller" level="DEBUG"/>
+    <logger name="com.saiteja.portfolio_backend.security" level="DEBUG"/>
+
+    <!-- Spring loggers -->
+    <logger name="org.springframework.security" level="WARN"/>
+    <logger name="org.springframework.web" level="INFO"/>
+    <logger name="org.springframework.ai" level="INFO"/>
+    <logger name="org.mongodb.driver" level="WARN"/>
+
+    <!-- ROOT LOGGER - Uses ASYNC_CONSOLE for Render -->
+    <root level="INFO">
+        <appender-ref ref="ASYNC_CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+    <!-- RENDER/PRODUCTION PROFILE -->
+    <springProfile name="render,prod">
+        <!-- Production: Less verbose -->
+        <logger name="com.saiteja.portfolio_backend" level="INFO"/>
+        <logger name="org.springframework.security" level="WARN"/>
+        <root level="INFO">
+            <appender-ref ref="ASYNC_CONSOLE"/>
+            <appender-ref ref="FILE"/>
+        </root>
+    </springProfile>
+
+    <!-- DEVELOPMENT PROFILE -->
+    <springProfile name="dev">
+        <!-- Development: More verbose -->
+        <logger name="com.saiteja.portfolio_backend" level="DEBUG"/>
+        <logger name="org.springframework.web" level="DEBUG"/>
+        <root level="DEBUG">
+            <appender-ref ref="ASYNC_CONSOLE"/>
+            <appender-ref ref="FILE"/>
+        </root>
+    </springProfile>
+
+</configuration>
+
