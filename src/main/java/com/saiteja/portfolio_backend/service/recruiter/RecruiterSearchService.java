@@ -72,6 +72,8 @@ public class RecruiterSearchService {
                 .map(doc -> doc.getString("summary"))
                 .toList();
 
+        summaries.forEach(System.out::println);
+
         String ranking = rerankService.rerankCandidates(query, summaries);
 
         System.out.println("LLM Ranking -> " + ranking);
