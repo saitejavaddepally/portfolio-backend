@@ -1,5 +1,6 @@
 package com.saiteja.portfolio_backend.service.recruiter;
 
+import com.saiteja.portfolio_backend.service.ai.CandidateRerankService;
 import com.saiteja.portfolio_backend.service.ai.QueryRewriteService;
 import lombok.RequiredArgsConstructor;
 import org.bson.Document;
@@ -22,6 +23,7 @@ public class RecruiterSearchService {
     private final EmbeddingModel embeddingModel;
     private final MongoTemplate mongoTemplate;
     private final QueryRewriteService queryRewriteService;
+    private final CandidateRerankService rerankService;
 
     public List<Document> searchCandidates(String query) {
 
@@ -65,6 +67,14 @@ public class RecruiterSearchService {
                 .getCollection("ai_summaries")
                 .aggregate(pipeline)
                 .into(new ArrayList<>());
+
+        List<String> summaries = results.stream()
+                .map(doc -> doc.getString("summary"))
+                .toList();
+
+        String ranking = rerankService.rerankCandidates(query, summaries);
+
+        System.out.println("LLM Ranking -> " + ranking);
 
         long duration = System.currentTimeMillis() - startTime;
         logger.info("Candidate search completed - Query: {} - Results: {} - Duration: {}ms",
