@@ -1,5 +1,6 @@
 package com.saiteja.portfolio_backend.service.recruiter;
 
+import com.saiteja.portfolio_backend.service.ai.QueryRewriteService;
 import lombok.RequiredArgsConstructor;
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -20,15 +21,18 @@ public class RecruiterSearchService {
 
     private final EmbeddingModel embeddingModel;
     private final MongoTemplate mongoTemplate;
+    private final QueryRewriteService queryRewriteService;
 
     public List<Document> searchCandidates(String query) {
 
         long startTime = System.currentTimeMillis();
         logger.info("Candidate search initiated - Query: {}", query);
 
-        logger.debug("Generating embedding for search query");
-        EmbeddingResponse response =
-                embeddingModel.embedForResponse(List.of(query));
+        String rewrittenQuery = queryRewriteService.rewriteQuery(query);
+
+        logger.info("Rewritten Query - {}" , rewrittenQuery);
+
+        EmbeddingResponse response = embeddingModel.embedForResponse(List.of(rewrittenQuery));
 
         float[] queryEmbedding = response.getResults().getFirst().getOutput();
 
