@@ -1,5 +1,7 @@
 package com.saiteja.portfolio_backend.config;
 
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +18,11 @@ public class AIModelConfig {
 
     @Value("${spring.ai.openai.base-url}")
     private String baseUrl;
+
+    @Bean
+    public ChatClient chatClient(@Qualifier("recruiterChatModel") ChatModel chatModel) {
+        return ChatClient.builder(chatModel).build();
+    }
 
     @Bean
     public OpenAiApi openAiApi() {
