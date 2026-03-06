@@ -81,10 +81,24 @@ public class RecruiterSearchService {
 
         System.out.println("LLM Ranking -> " + ranking);
 
-        long duration = System.currentTimeMillis() - startTime;
-        logger.info("Candidate search completed - Query: {} - Results: {} - Duration: {}ms",
-                query, results.size(), duration);
+        String[] parts = ranking.split(",");
 
-        return results;
+        List<Document> reorderedResults = new ArrayList<>();
+
+        for (String part : parts) {
+
+            int index = Integer.parseInt(part.trim()) - 1;
+
+            if (index >= 0 && index < results.size()) {
+                reorderedResults.add(results.get(index));
+            }
+        }
+
+        long duration = System.currentTimeMillis() - startTime;
+
+        logger.info("Candidate search completed - Query: {} - Results: {} - Duration: {}ms",
+                query, reorderedResults.size(), duration);
+
+        return reorderedResults;
     }
 }
