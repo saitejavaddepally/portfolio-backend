@@ -66,7 +66,6 @@ public class RecruiterSearchService {
                 .getCollection("ai_summaries")
                 .aggregate(pipeline)
                 .into(new ArrayList<>());
-
         // commenting out as it is not needed now
 //        List<Document> reorderedResults = getReorderedResults(query, results);
 
