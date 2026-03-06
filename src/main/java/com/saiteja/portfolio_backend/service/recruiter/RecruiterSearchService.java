@@ -69,7 +69,7 @@ public class RecruiterSearchService {
                 .into(new ArrayList<>());
 
         List<String> summaries = results.stream()
-                .map(doc -> doc.getString("summary"))
+                .map(doc -> doc.getString("structuredSummary"))
                 .toList();
 
         summaries.forEach(System.out::println);
