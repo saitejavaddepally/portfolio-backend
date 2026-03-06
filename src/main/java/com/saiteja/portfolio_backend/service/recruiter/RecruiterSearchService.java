@@ -32,7 +32,7 @@ public class RecruiterSearchService {
 
         String rewrittenQuery = queryRewriteService.rewriteQuery(query);
 
-        logger.info("Rewritten Query - {}" , rewrittenQuery);
+        logger.info("Rewritten Query - {}", rewrittenQuery);
 
         EmbeddingResponse response = embeddingModel.embedForResponse(List.of(rewrittenQuery));
 
@@ -69,7 +69,10 @@ public class RecruiterSearchService {
                 .into(new ArrayList<>());
 
         List<String> summaries = results.stream()
-                .map(doc -> doc.getString("structuredSummary"))
+                .map(doc -> {
+                    System.out.println("Document json " + doc.toJson());
+                    return doc.getString("structuredSummary");
+                })
                 .toList();
 
         summaries.forEach(System.out::println);
@@ -80,7 +83,7 @@ public class RecruiterSearchService {
 
         long duration = System.currentTimeMillis() - startTime;
         logger.info("Candidate search completed - Query: {} - Results: {} - Duration: {}ms",
-            query, results.size(), duration);
+                query, results.size(), duration);
 
         return results;
     }
