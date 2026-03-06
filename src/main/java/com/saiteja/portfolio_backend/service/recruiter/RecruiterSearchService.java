@@ -57,7 +57,7 @@ public class RecruiterSearchService {
         Document project = new Document("$project",
                 new Document("userEmail", 1)
                         .append("userId", 1)
-                        .append("structuredSummary", 1)
+                        .append("embeddingText", 1)
                         .append("score", new Document("$meta", "vectorSearchScore"))
         );
 
@@ -71,8 +71,7 @@ public class RecruiterSearchService {
 
         List<String> summaries = results.stream()
                 .map(doc -> {
-                    System.out.println("Document json " + doc.toJson());
-                    return doc.getString("structuredSummary");
+                    return doc.getString("embeddingText");
                 })
                 .toList();
 
