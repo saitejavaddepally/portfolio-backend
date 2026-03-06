@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.embedding.EmbeddingResponse;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,9 +27,6 @@ public class RecruiterSearchService {
     private final CandidateRerankService rerankService;
 
     public List<Document> searchCandidates(String query) {
-
-        long startTime = System.currentTimeMillis();
-        logger.info("Candidate search initiated - Query: {}", query);
 
         String rewrittenQuery = queryRewriteService.rewriteQuery(query);
 
@@ -69,13 +67,18 @@ public class RecruiterSearchService {
                 .aggregate(pipeline)
                 .into(new ArrayList<>());
 
+        // commenting out as it is not needed now
+//        List<Document> reorderedResults = getReorderedResults(query, results);
+
+        return results;
+    }
+
+    @NonNull
+    private List<Document> getReorderedResults(String query, List<Document> results) {
         List<String> summaries = results.stream()
-                .map(doc -> {
-                    return doc.getString("embeddingText");
-                })
+                .map(doc -> doc.getString("embeddingText"))
                 .toList();
 
-        summaries.forEach(System.out::println);
 
         String ranking = rerankService.rerankCandidates(query, summaries);
 
@@ -94,11 +97,9 @@ public class RecruiterSearchService {
             }
         }
 
-        long duration = System.currentTimeMillis() - startTime;
 
-        logger.info("Candidate search completed - Query: {} - Results: {} - Duration: {}ms",
-                query, reorderedResults.size(), duration);
-
+        logger.info("Candidate search completed - Query: {} - Results: {} ",
+                query, reorderedResults.size());
         return reorderedResults;
     }
 }
